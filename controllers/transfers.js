@@ -53,7 +53,7 @@ exports.newTransfer = async (req, res) => {
 
 
         const encryptedBalance = encryptData((balance - amount).toFixed(2), secretKey);
-        const encryptedBalance2 = encryptData((balance2 - amount).toFixed(2), secretKey);
+        const encryptedBalance2 = encryptData((balance2 + amount).toFixed(2), secretKey);
         await db.query('UPDATE accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance, fromAccount]);
         await db.query('UPDATE accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance2, toAccount]);
 
