@@ -3,7 +3,7 @@ const router = express.Router();
 const {newTransfer, history } = require('../controllers/transfers');
 
 router.post('/newTransfer', newTransfer);
-//router.post('/history', history);
+router.post('/history', history);
 
 
 

@@ -75,3 +75,22 @@ exports.newTransfer = async (req, res) => {
       res.status(500).json({ error: 'Error al realizar la transferencia' });
     }
   };
+
+exports.history = async (req, res) => {
+    const { accountNo } = req.body;
+  
+    try {
+        const [rows] = await db.query('SELECT * FROM transactions WHERE accountNo = ?', [accountNo]);  
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'No hay transferencias disponibles' });
+        }
+        const transactions = rows.map(transactions => ({
+            ...transactions
+        }));
+
+        res.status(200).json(transactions); 
+    } catch (error) {
+        console.error('Error al obtener las transferencias:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+};
