@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors'); 
 const userRoutes = require('./routes/users');
 const accountRoutes = require('./routes/account');
-const trabsaction = require('./routes/transfers')
+const transfers = require('./routes/transfers')
 
 
 const PORT = process.env.PORT || 3000;
@@ -27,13 +27,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-
-
 app.use(express.json());
 
 app.use('/user', userRoutes);
 app.use('/account', accountRoutes);
-app.use('/transasactions', trabsaction)
+app.use('/transfers', transfers)
 
 app.get('/', (req, res) => {
   res.send('¡Servidor funcionando!');
