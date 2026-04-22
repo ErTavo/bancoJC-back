@@ -23,7 +23,7 @@ exports.createUser = async (req, res) => {
     const encryptedEmail = encryptData(email, secretKey);
 
     const [result] = await db.query(
-      'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)',
+      'INSERT INTO jc_users (username, password_hash, email) VALUES (?, ?, ?)',
       [username, encryptedPassword, encryptedEmail]
     );
 
@@ -41,7 +41,7 @@ exports.getUserWithAuth = async (req, res) => {
   
     try {
   
-      const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);  
+      const [rows] = await db.query('SELECT * FROM jc_users WHERE username = ?', [username]);  
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
@@ -58,7 +58,7 @@ exports.getUserWithAuth = async (req, res) => {
         { expiresIn: '30m' }
       );
   
-      await db.query('UPDATE users SET last_hash = ? WHERE id = ?', [token, user.id]);
+      await db.query('UPDATE jc_users SET last_hash = ? WHERE id = ?', [token, user.id]);
   
       res.status(200).json({ hash: token });
     } catch (error) {
@@ -72,7 +72,7 @@ exports.validateUserHash = async (req, res) => {
     const jwtSecret = process.env.JWT_SECRET;
   
     try {
-      const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+      const [rows] = await db.query('SELECT * FROM jc_users WHERE username = ?', [username]);
   
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -105,7 +105,7 @@ exports.sendEmailCode = async (req, res) => {
     const secretKey = process.env.SECRET_KEY;
 
 
-    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);  
+    const [rows] = await db.query('SELECT * FROM jc_users WHERE username = ?', [username]);  
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
@@ -132,7 +132,7 @@ exports.sendEmailCode = async (req, res) => {
       };
   
       await transporter.sendMail(mailOptions);
-      await db.query('UPDATE users SET lastOTP = ? WHERE id = ?', [code, user.id]);
+      await db.query('UPDATE jc_users SET lastOTP = ? WHERE id = ?', [code, user.id]);
 
   
       res.status(200).json({ 
@@ -147,7 +147,7 @@ exports.sendEmailCode = async (req, res) => {
 exports.validateOTP = async (req, res) => {
     const { username, otp } = req.body;   
     try {
-      const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+      const [rows] = await db.query('SELECT * FROM jc_users WHERE username = ?', [username]);
   
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Usuario no encontrado' });

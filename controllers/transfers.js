@@ -21,7 +21,7 @@ exports.newTransfer = async (req, res) => {
     if (isNaN(amount) || typeof amount !== 'number') {
         return res.status(400).json({ error: 'El abono debe ser un número decimal válido' });
     }
-    let [rows] = await db.query('SELECT * FROM accounts WHERE accountNo = ?', [fromAccount]);  
+    let [rows] = await db.query('SELECT * FROM jc_accounts WHERE accountNo = ?', [fromAccount]);  
     if (rows.length === 0) {
         return res.status(404).json({ error: 'No existe la cuenta indicada' });
     }
@@ -34,7 +34,7 @@ exports.newTransfer = async (req, res) => {
         return res.status(404).json({ error: 'Fondos insuficientes para realizar la transferencia' });
     }
 
-    [rows] = await db.query('SELECT * FROM accounts WHERE accountNo = ?', [toAccount]);  
+    [rows] = await db.query('SELECT * FROM jc_accounts WHERE accountNo = ?', [toAccount]);  
     if (rows.length === 0) {
         return res.status(404).json({ error: 'No existe la cuenta indicada' });
     }
@@ -54,16 +54,16 @@ exports.newTransfer = async (req, res) => {
 
         const encryptedBalance = encryptData((balance - amount).toFixed(2), secretKey);
         const encryptedBalance2 = encryptData((balance2 - amount).toFixed(2), secretKey);
-        await db.query('UPDATE accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance, fromAccount]);
-        await db.query('UPDATE accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance2, toAccount]);
+        await db.query('UPDATE jc_accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance, fromAccount]);
+        await db.query('UPDATE jc_accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance2, toAccount]);
 
         const [result] = await db.query(
-            'INSERT INTO transactions (accountNo, amount, created_at, type, relatedAccount) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO jc_transactions (accountNo, amount, created_at, type, relatedAccount) VALUES (?, ?, ?, ?, ?)',
             [fromAccount, amount, formattedDate , "enviada", toAccount]
         );
 
         const [result2] = await db.query(
-            'INSERT INTO transactions (accountNo, amount, created_at, type, relatedAccount) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO jc_transactions (accountNo, amount, created_at, type, relatedAccount) VALUES (?, ?, ?, ?, ?)',
             [toAccount, amount, formattedDate , "recibida", fromAccount]
         );
 
@@ -80,7 +80,7 @@ exports.history = async (req, res) => {
     const { accountNo } = req.body;
   
     try {
-        const [rows] = await db.query('SELECT * FROM transactions WHERE accountNo = ?', [accountNo]);  
+        const [rows] = await db.query('SELECT * FROM jc_transactions WHERE accountNo = ?', [accountNo]);  
         if (rows.length === 0) {
             return res.status(404).json({ error: 'No hay transferencias disponibles' });
         }

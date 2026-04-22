@@ -32,7 +32,7 @@ exports.createAccount = async (req, res) => {
             return res.status(500).json({ error: 'Error al encriptar el balance' });
         }
         const [result] = await db.query(
-            'INSERT INTO accounts (accountNo, user, balance, type, currency) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO jc_accounts (accountNo, user, balance, type, currency) VALUES (?, ?, ?, ?, ?)',
             [accountNo, username, encryptedBalance, type, currency]
         );
 
@@ -48,7 +48,7 @@ exports.balance = async (req, res) => {
     const secretKey = process.env.SECRET_KEY;
   
     try {
-        const [rows] = await db.query('SELECT * FROM accounts WHERE user = ?', [username]);  
+        const [rows] = await db.query('SELECT * FROM jc_accounts WHERE user = ?', [username]);  
         if (rows.length === 0) {
             return res.status(404).json({ error: 'No hay cuentas disponibles' });
         }
@@ -72,7 +72,7 @@ exports.deposito = async (req, res) => {
         if (isNaN(abono) || typeof abono !== 'number') {
             return res.status(400).json({ error: 'El abono debe ser un número decimal válido' });
         }
-        const [rows] = await db.query('SELECT * FROM accounts WHERE accountNo = ?', [accountNo]);  
+        const [rows] = await db.query('SELECT * FROM jc_accounts WHERE accountNo = ?', [accountNo]);  
         if (rows.length === 0) {
             return res.status(404).json({ error: 'No existe la cuenta indicada' });
         }
@@ -86,7 +86,7 @@ exports.deposito = async (req, res) => {
         tenis = Math.round(tenis * 100) / 100;
 
         const encryptedBalance = encryptData(tenis.toFixed(2), secretKey);
-        await db.query('UPDATE accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance, accountNo]);
+        await db.query('UPDATE jc_accounts SET balance = ? WHERE accountNo = ?', [encryptedBalance, accountNo]);
 
         res.status(200).json({ message: `Se actualizó el balance. Nuevo balance: ${account.currency}.${tenis.toFixed(2)}` });
     } catch (error) {
