@@ -5,16 +5,8 @@
   ],
   "routes": [
     {
-      "src": "/user/(.*)",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/account/(.*)",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/transfers/(.*)",
-      "dest": "/index.js"
+      "src": "/(.*)",
+      "dest": "index.js"
     }
   ]
 }
